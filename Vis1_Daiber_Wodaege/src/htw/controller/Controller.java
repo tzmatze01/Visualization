@@ -32,8 +32,8 @@ public class Controller {
     public void initialize() {
 
         button.setText("Click me");
-        canvas.setHeight(300);
-        canvas.setWidth(400);
+        canvas.setHeight(600);
+        canvas.setWidth(800);
 
         gc = canvas.getGraphicsContext2D();
 
@@ -84,22 +84,40 @@ public class Controller {
     private void drawCircles(GraphicsContext gc) {
 
         // circles should have 'even' areas, therefore integer
-        int randNumSmallCircle = ThreadLocalRandom.current().nextInt((int)canvas.getWidth() / 10, (int)canvas.getWidth() / 2);    // TODO sollte nach GUI angepasst werden
+        // substract 'margin' from area that generated circles stay in canvas
+        double canvasArea = canvas.getWidth() * canvas.getHeight();
+
+        int randAreaSmallCircle = ThreadLocalRandom.current().nextInt((int)canvasArea / 150, (int)canvasArea / 60);    // TODO sollte nach canvas angepasst werden
 
         // big cirle should be a 'even' multiple of small circle
-        int randNumBigCircle = randNumSmallCircle * ThreadLocalRandom.current().nextInt(0, 20);
+        int randAreaBigCircle = randAreaSmallCircle * ThreadLocalRandom.current().nextInt(2, 20);
 
-        System.out.println("area small circle: "+randNumSmallCircle);
-        System.out.println("area big circle: "+randNumBigCircle);
+        System.out.println("area small circle: "+randAreaSmallCircle);
+        System.out.println("area big circle: "+randAreaBigCircle);
 
-        double radiusSmallCircle = Math.sqrt(randNumSmallCircle / Math.PI);
-        double radiusBigCircle = Math.sqrt(randNumBigCircle / Math.PI);
+        double radiusSmallCircle = Math.sqrt(randAreaSmallCircle);
+        double radiusBigCircle = Math.sqrt(randAreaBigCircle);
+
+
+        // TODO fläche schätzen mit radius eingezeichnet ?
+
+        System.out.println("rad small circle: "+radiusSmallCircle);
+        System.out.println("rad big circle: "+radiusBigCircle);
+
+        int ratio = (int) Math.ceil((double)randAreaBigCircle / randAreaSmallCircle);
+        //double rat = checkAreaRatio(randAreaBigCircle, randAreaSmallCircle);
+
+        System.out.println("\n\nratio is: "+(double)randAreaBigCircle / randAreaSmallCircle);
 
         Circle smallCircle = new Circle(radiusSmallCircle, Color.RED); // TODO IDEE verschiedene Farben - ob sich das auf x auswirkt?
         Circle bigCircle = new Circle(radiusBigCircle, Color.RED);
+//        Circle smallCircle = new Circle(100, Color.RED); // TODO IDEE verschiedene Farben - ob sich das auf x auswirkt?
+//        Circle bigCircle = new Circle(300, Color.RED);
 
-        smallCircle.drawCircle(gc, 0, radiusBigCircle);
-        bigCircle.drawCircle(gc, radiusBigCircle, 0);
+        gc.moveTo(canvas.getHeight() / 2, canvas.getWidth() / 4);
+        smallCircle.drawCircle(gc, 0, canvas.getHeight() / 4);
+        gc.moveTo(canvas.getHeight() / 2, canvas.getWidth() - canvas.getWidth() / 4);
+        bigCircle.drawCircle(gc, radiusSmallCircle, canvas.getHeight() / 4);
 
 
     }
