@@ -1,119 +1,205 @@
 package htw.controller;
 
 import htw.model.Circle;
+import htw.model.Square;
+import javafx.beans.binding.DoubleExpression;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.concurrent.ThreadLocalRandom;
-
 
 public class Controller {
 
+	private static DecimalFormat df2 = new DecimalFormat(".#");
+	boolean circleFlag = false;
+	boolean squareFlag = false;
 
-    @FXML
-    private Button button;
+	private enum MenuEntries {
+		CIRCILE("Circle"), SQUARE("Square");
 
-    @FXML
-    private Slider slider;
+		private final String name;
 
-    @FXML
-    private Canvas canvas;
+		MenuEntries(String s) {
+			name = s;
+		}
 
+		public String toString() {
+			return this.name;
+		}
+	}
 
-    private GraphicsContext gc;
+	@FXML
+	private ComboBox<MenuEntries> menuEntries;
 
-    private int canvasHeight = 600;
-    private int canvasWidth = 800;
-    private int canvasArea = canvasHeight * canvasWidth;
+	@FXML
+	private Slider slider;
 
-    @FXML
-    public void initialize() {
+	@FXML
+	private Button button;
 
-        button.setText("Click me");
-        canvas.setHeight(canvasHeight);
-        canvas.setWidth(canvasWidth);
+	@FXML
+	private Canvas canvas;
 
-        gc = canvas.getGraphicsContext2D();
+	@FXML
+	private Label resultLabel;
 
-        slider.setMin(1);
-        slider.setMax(12);
+	private GraphicsContext gc;
 
-        //drawCircles();
+	private int canvasHeight = 600;
+	private int canvasWidth = 800;
+	private int canvasArea = canvasHeight * canvasWidth;
 
-        int randAreaCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60);    // TODO sollte nach canvas angepasst werden
-        drawScaleableCircles(randAreaCircle, slider.getValue(), true);
+	@FXML
+	public void initialize() {
 
+		menuEntries.setItems(FXCollections.observableArrayList(MenuEntries.values()));
 
-        slider.valueProperty().addListener(new ChangeListener() {
+		button.setText("view result");
+		canvas.setHeight(canvasHeight);
+		canvas.setWidth(canvasWidth);
 
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+		gc = canvas.getGraphicsContext2D();
 
-                drawScaleableCircles(randAreaCircle, slider.getValue(), true);
-            }
-        });
-    }
+		slider.setMin(1);
+		slider.setMax(12);
 
+	}
 
-    @FXML
-    private void buttonClick()
-    {
+	@FXML
+	private void buttonClick() {
+		String result = df2.format(slider.getValue());
 
-        System.out.print("button");
-    }
+		resultLabel.setText(result);
 
-    private void drawScaleableCircles(double areaFixedCircle, double sliderValue, boolean drawRadius)
-    {
-        gc.clearRect(0,0, canvasWidth, canvasHeight);
+	}
 
-        double radiusFixedCircle = Math.sqrt(areaFixedCircle);
-        double radiusScaleableCircle = Math.sqrt(areaFixedCircle * sliderValue);
+	@FXML
+	public void chooseMenuEntry() {
 
-        Circle fixCircle = new Circle(radiusFixedCircle, Color.RED);
-        Circle scaleableCircle = new Circle(radiusScaleableCircle, Color.BLACK);
+		switch (menuEntries.getValue()) {
+		case CIRCILE:
+			circleFlag = true;
+			squareFlag = false;
+			resetGui();
+			circleTest();
+			break;
+		case SQUARE:
+			squareFlag = true;
+			circleFlag = false;
+			resetGui();
+			squareTest();
+			break;
+		default:
+			break;
+		}
+	}
 
-        fixCircle.drawCircle(gc, 0, canvasHeight / 4);
-        scaleableCircle.drawCircle(gc, radiusFixedCircle, canvasHeight / 4);
+	public void resetGui() {
+		resultLabel.setText("result");
+		slider.setValue(1);
+		gc.clearRect(0, 0, canvasWidth, canvasHeight);
+	}
 
-        if(drawRadius)
-        {
-            double x1 = radiusFixedCircle + radiusScaleableCircle / 2;
-            double y1 = (canvasHeight / 4) + radiusScaleableCircle / 2;
-            double x2 = radiusFixedCircle + radiusScaleableCircle;
-            double y2 = (canvasHeight / 4) + radiusScaleableCircle / 2;
+	public void circleTest() {
+		// drawCircles();
 
-            gc.strokeLine(x1, y1, x2, y2);
-        }
-    }
+		int randAreaCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60); // TODO sollte nach
+																										// canvas
+																										// angepasst
+																										// werden
+		drawScaleableCircles(randAreaCircle, slider.getValue(), true);
 
-    // generate two cirles with random numbers as radius and return the ratio
-    private int drawCircles() {
+		slider.valueProperty().addListener(new ChangeListener() {
 
-        int randAreaSmallCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60);    // TODO sollte nach canvas angepasst werden
-        int ratio = ThreadLocalRandom.current().nextInt(2, 12);
+			@Override
+			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+				if (circleFlag == true) {
+					drawScaleableCircles(randAreaCircle, slider.getValue(), true);
+				} if (squareFlag == true) {
+					//drawScaleableSquares);
+				}
+				
+				
+				System.out.println(slider.getValue());
 
-        // big cirle should be a 'even' multiple of small circle
-        int randAreaBigCircle = randAreaSmallCircle * ratio;
+			}
+		});
+	}
 
-        double radiusSmallCircle = Math.sqrt(randAreaSmallCircle);
-        double radiusBigCircle = Math.sqrt(randAreaBigCircle);
+	public void squareTest() {
+		drawScaleableSquares();
+	}
 
-        // TODO fläche schätzen mit radius eingezeichnet ?
-        // TODO IDEE verschiedene Farben - ob sich das auf x auswirkt?
+	/*
+	 * shape creation
+	 */
 
-        Circle smallCircle = new Circle(radiusSmallCircle, Color.RED);
-        Circle bigCircle = new Circle(radiusBigCircle, Color.RED);
+	private void drawScaleableSquares() {
+		Square fixSquare = new Square(5);
 
-        smallCircle.drawCircle(gc, 0, canvasHeight / 4);
-        bigCircle.drawCircle(gc, radiusSmallCircle, canvasHeight / 4);
+		
+	}
 
-        return ratio;
-    }
+	private void drawScaleableCircles(double areaFixedCircle, double sliderValue, boolean drawRadius) {
+		gc.clearRect(0, 0, canvasWidth, canvasHeight); 
+
+		double radiusFixedCircle = Math.sqrt(areaFixedCircle);
+		double radiusScaleableCircle = Math.sqrt(areaFixedCircle * sliderValue);
+
+		Circle fixCircle = new Circle(radiusFixedCircle, Color.RED);
+		Circle scaleableCircle = new Circle(radiusScaleableCircle, Color.BLACK);
+
+		fixCircle.drawCircle(gc, 0, canvasHeight / 4);
+		scaleableCircle.drawCircle(gc, radiusFixedCircle, canvasHeight / 4);
+
+		if (drawRadius) {
+			double x1 = radiusFixedCircle + radiusScaleableCircle / 2;
+			double y1 = (canvasHeight / 4) + radiusScaleableCircle / 2;
+			double x2 = radiusFixedCircle + radiusScaleableCircle;
+			double y2 = (canvasHeight / 4) + radiusScaleableCircle / 2;
+
+			gc.strokeLine(x1, y1, x2, y2);
+		}
+	}
+
+	// generate two cirles with random numbers as radius and return the ratio
+	private int drawCircles() {
+
+		int randAreaSmallCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60); // TODO sollte
+																											// nach
+																											// canvas
+																											// angepasst
+																											// werden
+		int ratio = ThreadLocalRandom.current().nextInt(2, 12);
+
+		// big cirle should be a 'even' multiple of small circle
+		int randAreaBigCircle = randAreaSmallCircle * ratio;
+
+		double radiusSmallCircle = Math.sqrt(randAreaSmallCircle);
+		double radiusBigCircle = Math.sqrt(randAreaBigCircle);
+
+		// TODO fläche schätzen mit radius eingezeichnet ?
+		// TODO IDEE verschiedene Farben - ob sich das auf x auswirkt?
+
+		Circle smallCircle = new Circle(radiusSmallCircle, Color.RED);
+		Circle bigCircle = new Circle(radiusBigCircle, Color.RED);
+
+		smallCircle.drawCircle(gc, 0, canvasHeight / 4);
+		bigCircle.drawCircle(gc, radiusSmallCircle, canvasHeight / 4);
+
+		return ratio;
+	}
 
 }
