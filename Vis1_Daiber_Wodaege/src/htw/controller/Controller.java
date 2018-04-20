@@ -55,6 +55,9 @@ public class Controller {
 	@FXML
 	private Label resultLabel;
 
+	@FXML
+	private Label infoLabel;
+
 	private GraphicsContext gc;
 
 	private int canvasHeight = 600;
@@ -64,9 +67,9 @@ public class Controller {
 	@FXML
 	public void initialize() {
 
+		infoLabel.setText("Wählen Sie einen Test aus.");
 		menuEntries.setItems(FXCollections.observableArrayList(MenuEntries.values()));
 
-		button.setText("view result");
 		canvas.setHeight(canvasHeight);
 		canvas.setWidth(canvasWidth);
 
@@ -75,13 +78,17 @@ public class Controller {
 		slider.setMin(1);
 		slider.setMax(12);
 
+		button.setText("view result");
+		resultLabel.setText("result");
 	}
 
 	@FXML
 	private void buttonClick() {
-		String result = df2.format(slider.getValue());
+		double result = calculateResult(slider.getValue());
 
-		resultLabel.setText(result);
+		String resultAsString = df2.format(result);
+
+		resultLabel.setText(resultAsString);
 
 	}
 
@@ -113,6 +120,9 @@ public class Controller {
 	}
 
 	public void circleTest() {
+		infoLabel.setText(
+				"Bitte ziehen Sie den roten Kreis auf bis dieser im Verhältnis \n die dreifache Größe des schwarzen Kreises hat.");
+
 		// drawCircles();
 
 		int randAreaCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60); // TODO sollte nach
@@ -127,11 +137,11 @@ public class Controller {
 			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
 				if (circleFlag == true) {
 					drawScaleableCircles(randAreaCircle, slider.getValue(), true);
-				} if (squareFlag == true) {
-					//drawScaleableSquares);
 				}
-				
-				
+				if (squareFlag == true) {
+					// drawScaleableSquares);
+				}
+
 				System.out.println(slider.getValue());
 
 			}
@@ -139,6 +149,8 @@ public class Controller {
 	}
 
 	public void squareTest() {
+		infoLabel.setText(
+				"Bitte ziehen Sie das rote Quadrat auf bis dieses im Verhältnis \n die dreifache Größe des schwarzen Quadrates hat.");
 		drawScaleableSquares();
 	}
 
@@ -149,11 +161,10 @@ public class Controller {
 	private void drawScaleableSquares() {
 		Square fixSquare = new Square(5);
 
-		
 	}
 
 	private void drawScaleableCircles(double areaFixedCircle, double sliderValue, boolean drawRadius) {
-		gc.clearRect(0, 0, canvasWidth, canvasHeight); 
+		gc.clearRect(0, 0, canvasWidth, canvasHeight);
 
 		double radiusFixedCircle = Math.sqrt(areaFixedCircle);
 		double radiusScaleableCircle = Math.sqrt(areaFixedCircle * sliderValue);
@@ -202,4 +213,11 @@ public class Controller {
 		return ratio;
 	}
 
+	// berechne x für (wahrgenommenes verhältnis) = (tatsächliches verhältnis)^x
+	private double calculateResult(double astimatedRatio) {
+		int realRation = 3;
+		double result;
+		return result = Math.log(astimatedRatio) / Math.log(realRation);
+
+	}
 }

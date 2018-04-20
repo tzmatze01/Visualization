@@ -20,7 +20,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         BorderPane root = FXMLLoader.load(getClass().getResource("/htw/controller/sample.fxml"));
-        primaryStage.setTitle("Vis1 - Daiber");
+        primaryStage.setTitle("Vis1 - Daiber Wodäge");
 
         /*
         borderPane = new BorderPane(root);
