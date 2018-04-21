@@ -1,10 +1,12 @@
 package htw.model;
 
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+
 
 public class Square {
 
-    private float sideLength;
+    private double sideLength;
     private Color color;
 
     public Square() {
@@ -13,11 +15,13 @@ public class Square {
 
     }
 
-    public Square(float radius) {
-        this.sideLength = radius;
+    public Square(double sideLength, Color color) {
+
+        this.sideLength = sideLength;
+        this.color = color;
     }
 
-    public float getSideLength() {
+    public double getSideLength() {
         return sideLength;
     }
 
@@ -31,5 +35,11 @@ public class Square {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public void draw(GraphicsContext gc, double xPos, double yPos)
+    {
+        gc.setFill(color);
+        gc.fillRect(xPos, yPos, sideLength, sideLength);
     }
 }

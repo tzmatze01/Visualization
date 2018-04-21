@@ -23,11 +23,12 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Controller {
 
 	private static DecimalFormat df2 = new DecimalFormat(".#");
-	boolean circleFlag = false;
-	boolean squareFlag = false;
+	int menuFlag = 0;
 
 	private enum MenuEntries {
-		CIRCILE("Circle"), SQUARE("Square");
+		CIRCILE("Circle"),
+		SQUARE("Square"),
+		PROGRAM("Program");
 
 		private final String name;
 
@@ -64,10 +65,12 @@ public class Controller {
 	private int canvasWidth = 800;
 	private int canvasArea = canvasHeight * canvasWidth;
 
+	private int randFixedArea;
+
 	@FXML
 	public void initialize() {
 
-		infoLabel.setText("Wählen Sie einen Test aus.");
+		infoLabel.setText("Waehlen Sie einen Test aus.");
 		menuEntries.setItems(FXCollections.observableArrayList(MenuEntries.values()));
 
 		canvas.setHeight(canvasHeight);
@@ -78,8 +81,29 @@ public class Controller {
 		slider.setMin(1);
 		slider.setMax(12);
 
-		button.setText("view result");
-		resultLabel.setText("result");
+		button.setText("Ergebnis anzeigen");
+		resultLabel.setText("Ergebnis");
+
+		randFixedArea = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60);
+
+		slider.valueProperty().addListener(new ChangeListener() {
+
+			@Override
+			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+
+				programChange();
+				/*
+				if (menuFlag == true) {
+					drawScaleableCircles(slider.getValue(), true);
+				}
+				if (squareFlag == true) {
+					drawScaleableSquares(slider.getValue());
+				}
+
+				System.out.println(slider.getValue());
+				*/
+			}
+		});
 	}
 
 	@FXML
@@ -92,95 +116,117 @@ public class Controller {
 
 	}
 
+	private void programChange() {
+
+		switch (menuEntries.getValue()) {
+			case CIRCILE:
+				infoLabel.setText("Bitte ziehen Sie den roten Kreis auf bis dieser im Verhaeltnis \n die dreifache Groesse des schwarzen Kreises hat.");
+				drawScaleableCircles(slider.getValue(), true);
+				break;
+			case SQUARE:
+				infoLabel.setText("Bitte ziehen Sie das rote Quadrat auf bis dieses im Verhaeltnis \n die dreifache Groesse des schwarzen Quadrates hat.");
+				drawScaleableSquares(slider.getValue());
+				break;
+			case PROGRAM:
+				break;
+
+			default:
+				break;
+		}
+
+	}
+
+
+
 	@FXML
 	public void chooseMenuEntry() {
 
+		resetGui();
+		programChange();
+
+		/*
 		switch (menuEntries.getValue()) {
 		case CIRCILE:
 			circleFlag = true;
 			squareFlag = false;
 			resetGui();
-			circleTest();
+			infoLabel.setText("Bitte ziehen Sie den roten Kreis auf bis dieser im Verhaeltnis \n die dreifache Groesse des schwarzen Kreises hat.");
+			drawScaleableCircles(slider.getValue(), true);
 			break;
 		case SQUARE:
 			squareFlag = true;
 			circleFlag = false;
 			resetGui();
-			squareTest();
+			infoLabel.setText("Bitte ziehen Sie das rote Quadrat auf bis dieses im Verhaeltnis \n die dreifache Groesse des schwarzen Quadrates hat.");
+			drawScaleableSquares(slider.getValue());
 			break;
+		case PROGRAM:
+			break;
+
 		default:
 			break;
 		}
+		*/
 	}
 
 	public void resetGui() {
-		resultLabel.setText("result");
+		resultLabel.setText("Ergebnis");
 		slider.setValue(1);
 		gc.clearRect(0, 0, canvasWidth, canvasHeight);
-	}
-
-	public void circleTest() {
-		infoLabel.setText(
-				"Bitte ziehen Sie den roten Kreis auf bis dieser im Verhältnis \n die dreifache Größe des schwarzen Kreises hat.");
-
-		// drawCircles();
-
-		int randAreaCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60); // TODO sollte nach
-																										// canvas
-																										// angepasst
-																										// werden
-		drawScaleableCircles(randAreaCircle, slider.getValue(), true);
-
-		slider.valueProperty().addListener(new ChangeListener() {
-
-			@Override
-			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-				if (circleFlag == true) {
-					drawScaleableCircles(randAreaCircle, slider.getValue(), true);
-				}
-				if (squareFlag == true) {
-					// drawScaleableSquares);
-				}
-
-				System.out.println(slider.getValue());
-
-			}
-		});
-	}
-
-	public void squareTest() {
-		infoLabel.setText(
-				"Bitte ziehen Sie das rote Quadrat auf bis dieses im Verhältnis \n die dreifache Größe des schwarzen Quadrates hat.");
-		drawScaleableSquares();
 	}
 
 	/*
 	 * shape creation
 	 */
 
-	private void drawScaleableSquares() {
-		Square fixSquare = new Square(5);
+	private void drawScaleableSquares(double sliderValue) {
+
+		gc.clearRect(0, 0, canvasWidth, canvasHeight);
+
+		double sideFixedSquare = Math.sqrt(randFixedArea);
+		double sideScaleableSquare = Math.sqrt(randFixedArea * sliderValue);
+
+		Square fixSquare = new Square(sideFixedSquare, Color.BLACK);
+		Square scalableSquare = new Square(sideScaleableSquare, Color.RED);
+
+		fixSquare.draw(gc, 0, canvasHeight / 4);
+		scalableSquare.draw(gc, sideFixedSquare*2, canvasHeight / 4);
 
 	}
 
-	private void drawScaleableCircles(double areaFixedCircle, double sliderValue, boolean drawRadius) {
+	private void drawScaleableCircles(double sliderValue, boolean drawRadius) {
+
 		gc.clearRect(0, 0, canvasWidth, canvasHeight);
 
-		double radiusFixedCircle = Math.sqrt(areaFixedCircle);
-		double radiusScaleableCircle = Math.sqrt(areaFixedCircle * sliderValue);
+		double radiusFixedCircle = Math.sqrt(randFixedArea);
+		double radiusScaleableCircle = Math.sqrt(randFixedArea * sliderValue);
 
-		Circle fixCircle = new Circle(radiusFixedCircle, Color.RED);
-		Circle scaleableCircle = new Circle(radiusScaleableCircle, Color.BLACK);
+		Circle fixCircle = new Circle(radiusFixedCircle, Color.BLACK);
+		Circle scaleableCircle = new Circle(radiusScaleableCircle, Color.RED);
 
 		fixCircle.drawCircle(gc, 0, canvasHeight / 4);
-		scaleableCircle.drawCircle(gc, radiusFixedCircle, canvasHeight / 4);
+		scaleableCircle.drawCircle(gc, radiusFixedCircle*2, canvasHeight / 4);
 
 		if (drawRadius) {
-			double x1 = radiusFixedCircle + radiusScaleableCircle / 2;
-			double y1 = (canvasHeight / 4) + radiusScaleableCircle / 2;
-			double x2 = radiusFixedCircle + radiusScaleableCircle;
-			double y2 = (canvasHeight / 4) + radiusScaleableCircle / 2;
 
+
+			// radius small circle
+			double x1 = radiusFixedCircle / 2;
+			double y1 = canvasHeight / 4 + radiusFixedCircle / 2;
+			double x2 = radiusFixedCircle;
+			double y2 = canvasHeight / 4 + radiusFixedCircle / 2;
+
+			gc.setStroke(Color.WHITE);
+			gc.strokeLine(x1, y1, x2, y2);
+
+			// radius big circle
+			x1 = radiusFixedCircle * 2 + radiusScaleableCircle / 2;
+			y1 = (canvasHeight / 4) + radiusScaleableCircle / 2;
+			x2 = radiusFixedCircle * 2 + radiusScaleableCircle;
+			y2 = (canvasHeight / 4) + radiusScaleableCircle / 2;
+
+
+			gc.setStroke(Color.BLACK);
 			gc.strokeLine(x1, y1, x2, y2);
 		}
 	}
@@ -188,11 +234,9 @@ public class Controller {
 	// generate two cirles with random numbers as radius and return the ratio
 	private int drawCircles() {
 
-		int randAreaSmallCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60); // TODO sollte
-																											// nach
-																											// canvas
-																											// angepasst
-																											// werden
+		gc.clearRect(0, 0, canvasWidth, canvasHeight);
+
+		int randAreaSmallCircle = ThreadLocalRandom.current().nextInt(canvasArea / 150, canvasArea / 60);
 		int ratio = ThreadLocalRandom.current().nextInt(2, 12);
 
 		// big cirle should be a 'even' multiple of small circle
@@ -204,7 +248,7 @@ public class Controller {
 		// TODO flÃ¤che schÃ¤tzen mit radius eingezeichnet ?
 		// TODO IDEE verschiedene Farben - ob sich das auf x auswirkt?
 
-		Circle smallCircle = new Circle(radiusSmallCircle, Color.RED);
+		Circle smallCircle = new Circle(radiusSmallCircle, Color.BLACK);
 		Circle bigCircle = new Circle(radiusBigCircle, Color.RED);
 
 		smallCircle.drawCircle(gc, 0, canvasHeight / 4);
@@ -213,7 +257,7 @@ public class Controller {
 		return ratio;
 	}
 
-	// berechne x für (wahrgenommenes verhältnis) = (tatsächliches verhältnis)^x
+	// berechne x fï¿½r (wahrgenommenes verhï¿½ltnis) = (tatsï¿½chliches verhï¿½ltnis)^x
 	private double calculateResult(double astimatedRatio) {
 		int realRation = 3;
 		double result;

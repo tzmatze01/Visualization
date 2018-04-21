@@ -37,8 +37,8 @@ public class Circle {
 
     public void drawCircle(GraphicsContext gc, double xPos, double yPos)
     {
-        gc.fillOval(xPos, yPos, radius, radius);
         gc.setFill(color);
+        gc.fillOval(xPos, yPos, radius, radius);
 
         /*
         from javafx documentation - fillOval
