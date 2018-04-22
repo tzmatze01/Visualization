@@ -11,10 +11,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.TextField?>
 <BorderPane maxHeight="800.0" maxWidth="1200.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="htw.controller.Controller">
 
 
-        <center>
+        <center >
             <Canvas fx:id="canvas" />
 
         </center>
@@ -23,27 +24,37 @@
                 <padding>
                     <Insets bottom="25" left="25" right="25" top="25" />
                 </padding>
-         <ComboBox fx:id="menuEntries" onAction="#chooseMenuEntry" prefWidth="150.0" promptText="choose Test" />
+                <HBox>
+                    <ComboBox fx:id="menuEntries" onAction="#chooseMenuEntry" prefWidth="150.0" promptText="Waehle Test" />
+                    <Button fx:id="btnNext" onAction="#nextShape"></Button>
+                </HBox>
                 <Slider fx:id="slider" />
-         <HBox prefHeight="100.0" prefWidth="200.0">
+                <HBox prefHeight="100.0" prefWidth="200.0">
             <children>
-                      <Button fx:id="button" onAction="#buttonClick" />
-               <Label fx:id="resultLabel" text="result">
-                  <padding>
-                     <Insets left="20.0" />
-                  </padding>
-               </Label>
+                      <Button fx:id="btnCalc" onAction="#calcRatio" />
+                        <Label fx:id="resultLabel" text="result">
+                        <padding>
+                             <Insets left="20.0" />
+                          </padding>
+                        </Label>
             </children>
-         </HBox>
+                 </HBox>
             </VBox>
         </bottom>
-   <top>
-      <Label fx:id="infoLabel" text="Label" textFill="RED" BorderPane.alignment="CENTER">
-         <font>
-            <Font name="Arial" size="20.0" />
-         </font>
-      </Label>
-   </top>
+           <top>
+               <VBox alignment="TOP_CENTER">
+                  <Label fx:id="infoLabel" text="Label" textFill="RED" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font name="Arial" size="20.0" />
+                     </font>
+                  </Label>
+
+                   <HBox alignment="TOP_CENTER">
+                       <Label fx:id="lblEstimate" text="Schätzung: "></Label>
+                       <TextField fx:id="tfEstimate" prefWidth="150.0"></TextField>
+                   </HBox>
+               </VBox>
+           </top>
 
 
 </BorderPane>
