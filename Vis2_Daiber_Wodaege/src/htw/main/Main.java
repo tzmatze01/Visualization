@@ -37,7 +37,7 @@ public class Main extends Application {
         borderPane.setCenter(canvas);
         */
         //primaryStage.setScene(borderPane);
-        primaryStage.setScene(new Scene(root, 1000, 800));
+        primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.sizeToScene();
         primaryStage.show();
     }

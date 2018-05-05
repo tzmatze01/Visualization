@@ -16,6 +16,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -95,8 +96,8 @@ public class Controller {
 
 	private GraphicsContext gc;
 
-	private int canvasHeight = 600;
-	private int canvasWidth = 800;
+	private int canvasHeight = 300;
+	private int canvasWidth = 400;
 	private int canvasArea = canvasHeight * canvasWidth;
 
 	private int displayTime = 2000;
@@ -133,12 +134,9 @@ public class Controller {
 
 		showDiffObject = random.nextBoolean();
 
-		System.out.println("showDiffObject: "+showDiffObject);
+		//System.out.println("showDiffObject: "+showDiffObject);
 
-		if (button.getText() == "Ende") {
-			System.exit(0);
-		}
-		
+
 		if (testFlag == 1) {
 			test1();
 		}
@@ -154,6 +152,9 @@ public class Controller {
 		if(testFlag == 5) {
 			test5();
 			lastTest = true;
+		}
+		if(testFlag == 6) {
+			System.exit(0);
 		}
 
 		testFlag++;
@@ -288,12 +289,12 @@ public class Controller {
 	public void test4() {
 
 		if (showDiffObject) {
-			drawRandomTriangles(showDiffObject, 49, Color.RED);
-			drawRandomTriangles(false, 49, Color.RED);
+			drawRandomTriangles(20, showDiffObject, 1, Color.RED);
+			drawRandomTriangles(20, false, 1, Color.RED);
 		}
 		else
 		{
-			drawRandomTriangles(showDiffObject, 50, Color.RED);
+			drawRandomTriangles(20, showDiffObject, 11, Color.RED);
 		}
 
 
@@ -303,11 +304,13 @@ public class Controller {
 	public void test5() {
 
 		if (showDiffObject) {
+			drawElephant();
 			drawRandomCircles(20, 50, Color.BLUE);
 			drawRandomSquares(20, 1, Color.BLUE);
 		}
 		else
 		{
+			drawElephant();
 		}
 	}
 
@@ -345,13 +348,13 @@ public class Controller {
 		}
 	}
 
-	public void drawRandomTriangles(boolean upright, int number, Color color) {
+	public void drawRandomTriangles(int sideLength, boolean upright, int number, Color color) {
 
 		for (int i = 0; i < number; i++) {
-			int xFaktor = random.nextInt(30);
-			int yFaktor = random.nextInt(40);
+			xPos = random.nextInt(canvasWidth);
+			yPos = random.nextInt(canvasHeight);
 
-			drawTriangle(upright, xFaktor, yFaktor, color);
+			drawTriangle(sideLength, upright, xPos, yPos, color);
 		}
 	}
 
@@ -362,28 +365,16 @@ public class Controller {
 
 	}
 
-	// myb draw rectangle
-
-	public void drawTriangle(boolean upright, int xFaktor, int yFaktor, Color color)
+	public void drawTriangle(int sideLength, boolean upright, int xPos, int yPos, Color color)
 	{
-		gc.setStroke(color);
-		gc.beginPath();
-		gc.moveTo(5 * xFaktor, 5 * yFaktor);
-
-		if(upright)
-			gc.lineTo(5 * xFaktor, 20 * yFaktor);
-		else
-			gc.moveTo(20 * xFaktor, 5 * yFaktor);
-
-		gc.lineTo(20 * xFaktor, 20 * yFaktor);
-		gc.lineTo(5 * xFaktor, 5 * yFaktor);
-		gc.stroke();
+		Image image = new Image(new File("resources/triangle.png").toURI().toString());
+		gc.drawImage(image, xPos, yPos);
 	}
 
 	public void drawElephant()
 	{
-		Image image = new Image("/pink_elephant.png");
-		gc.drawImage(image, canvasWidth / 2, canvasHeight / 2);
+		Image image = new Image(new File("resources/pink_elephant.png").toURI().toString());
+		gc.drawImage(image, 200,200, canvasWidth / 2, canvasHeight / 2);
 	}
 
 }
