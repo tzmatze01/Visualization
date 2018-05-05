@@ -40,7 +40,6 @@ public class Controller {
 		public String toString() {
 			return this.name;
 		}
-
 	}
 
 	private enum DpTime {
@@ -70,15 +69,45 @@ public class Controller {
 
 	}
 
+	private enum ObjCount {
+
+		N80("80 Objekte", 80),
+		N70("70 Objeckte", 70),
+		N50("50 Objekte", 50),
+		N30("30 Objekte", 30),
+		N20("20 Objekte", 20);
+
+		private final int value;
+		private final String text;
+
+		ObjCount(String text, int value)
+		{
+			this.text = text;
+			this.value = value;
+		}
+
+		public int getValue() {
+			return this.value;
+		}
+
+		public String toString() {
+			return this.text;
+		}
+
+	}
+
 	private boolean answer;
 	private boolean lastTest = false;
 	private int testFlag = 1;
 	private int xPos;
 	private int yPos;
 	private boolean showDiffObject;
+	private int numObjects = 50;
 
 	private Random random = new Random();
 
+	@FXML
+	private ComboBox<ObjCount> cb_numObjects = new ComboBox<>();
 	@FXML
 	private ComboBox<DpTime> cb_displayTime = new ComboBox<>();
 
@@ -108,10 +137,11 @@ public class Controller {
 	@FXML
 	public void initialize() {
 
-		label.setText("Folgend erscheinen mehrere Objekte.\nZum Starten der Tests Anzeigezeit wählen und den Button Test 1 clicken.");
+		label.setText("Folgend erscheinen mehrere Objekte.\nZum Starten der Tests Anzeigezeit & Objektanzahl wählen\nund den Button Test 1 clicken.");
 		comboBox.setItems(FXCollections.observableArrayList(Answer.values()));
 		comboBox.setDisable(true);
 		cb_displayTime.setItems(FXCollections.observableArrayList(DpTime.S2, DpTime.S1, DpTime.MS500, DpTime.MS250, DpTime.MS150));
+		cb_numObjects.setItems(FXCollections.observableArrayList(ObjCount.N80, ObjCount.N70, ObjCount.N50, ObjCount.N30, ObjCount.N20));
 		button.setText("Test " + testFlag);
 		buttonCheck.setDisable(true);
 		canvas.setHeight(canvasHeight);
@@ -130,6 +160,10 @@ public class Controller {
 	@FXML
 	private void buttonClick() {
 		gc.clearRect(0, 0, canvasWidth, canvasHeight);
+		label.setText("...");
+		buttonCheck.setDisable(true);
+		comboBox.setDisable(true);
+		comboBox.setPromptText("Bitte Wählen!");
 
 
 		showDiffObject = random.nextBoolean();
@@ -190,6 +224,11 @@ public class Controller {
 	}
 
 	@FXML
+	public void setNumObjects() {
+		numObjects = cb_numObjects.getValue().getValue();
+	}
+
+	@FXML
 	public void setDisplayTime() {
 
 		displayTime = cb_displayTime.getValue().getValue();
@@ -198,14 +237,16 @@ public class Controller {
 	@FXML
 	public void chooseAnswer() {
 
+		buttonCheck.setDisable(false);
+
 		switch (comboBox.getValue()) {
 		case JA:
 			answer = true;
-			buttonCheck.setDisable(false);
+			//buttonCheck.setDisable(false);
 			break;
 		case NEIN:
 			answer = false;
-			button.setDisable(false);
+			//button.setDisable(false);
 			break;
 		default:
 			break;
@@ -232,6 +273,9 @@ public class Controller {
 			question = "Haben Sie das gedrehte Dreieck gesehen?";
 		}
 		if (testFlag == 6) {
+			question = "Haben Sie ein rotes Dreieck gesehn?";
+		}
+		if (testFlag == 7) {
 			question = "Haben Sie einen rosa Elefant gesehn?";
 		}
 
@@ -246,7 +290,7 @@ public class Controller {
 		if (answer == showDiffObject) {
 			gc.fillText("Die Antwort war korrekt.", canvasWidth / 3, canvasHeight / 2);
 		} else {
-			gc.fillText("Die Antwort war nicht korrekt.", canvasWidth / 3, canvasHeight / 2);
+			gc.fillText("Die Antwort war nicht korrekt.", canvasWidth / 4, canvasHeight / 2);
 		}
 
 	}
@@ -254,11 +298,11 @@ public class Controller {
 	// Schwarzer Kreis
 	public void test1() {
 		if (showDiffObject) {
-			drawRandomCircles(20, 49, Color.BLUE);
+			drawRandomCircles(20, numObjects-1, Color.BLUE);
 			drawRandomCircles(20, 1, Color.BLACK);
 		}
 		else
-			drawRandomCircles(20, 50, Color.BLUE);
+			drawRandomCircles(20, numObjects, Color.BLUE);
 
 
 	}
@@ -267,55 +311,70 @@ public class Controller {
 	public void test2() {
 		if (showDiffObject)
 		{
-			drawRandomCircles(20, 49, Color.BLUE);
+			drawRandomCircles(20, numObjects-1, Color.BLUE);
 			drawRandomCircles(40, 1, Color.BLUE);
 		}
 		else
-			drawRandomCircles(20, 50, Color.BLUE);
+			drawRandomCircles(20, numObjects, Color.BLUE);
 
 	}
 
 	// Ein Quadrat und Kreise
 	public void test3() {
 		if (showDiffObject) {
-			drawRandomCircles(20, 49, Color.BLUE);
+			drawRandomCircles(20, numObjects-1, Color.BLUE);
 			drawRandomSquares(20, 1, Color.BLUE);
 		}
 		else
-			drawRandomCircles(20, 50, Color.BLUE);
+			drawRandomCircles(20, numObjects, Color.BLUE);
 	}
 
 	// Ein verdrehtes Dreieck
 	public void test4() {
 
 		if (showDiffObject) {
-			drawRandomTriangles(20, showDiffObject, 1, Color.RED);
-			drawRandomTriangles(20, false, 1, Color.RED);
+			drawRandomTriangles(20, showDiffObject, numObjects-1);
+			drawRandomTriangles(20, false, 1);
 		}
 		else
 		{
-			drawRandomTriangles(20, showDiffObject, 11, Color.RED);
+			drawRandomTriangles(20, showDiffObject, numObjects);
 		}
 
 
 	}
 
-	// Ein rosa Elefant
+	// Ein Dreieck, 2 unterschiedliche andere Formen
 	public void test5() {
 
 		if (showDiffObject) {
-			drawElephant();
-			drawRandomCircles(20, 50, Color.BLUE);
-			drawRandomSquares(20, 1, Color.BLUE);
+			drawRandomCircles(20, numObjects/2, Color.RED);
+			drawRandomSquares(20, numObjects/2 - 1, Color.RED);
+			drawRandomTriangles(20, false, 1);
 		}
 		else
 		{
-			drawElephant();
+			drawRandomCircles(20, numObjects/2, Color.RED);
+			drawRandomSquares(20, numObjects/2 , Color.RED);
 		}
 	}
 
 
+	// Ein rosa Elefant
+	public void test6() {
 
+		if (showDiffObject) {
+			drawElephant();
+			drawRandomCircles(20, numObjects/2, Color.BLUE);
+			drawRandomSquares(20, numObjects/2 - 1, Color.BLUE);
+		}
+		else
+		{
+			drawRandomCircles(20, numObjects/2, Color.BLUE);
+			drawRandomSquares(20, numObjects/2 - 1, Color.BLUE);
+			drawElephant();
+		}
+	}
 
 
 	/*
@@ -348,13 +407,40 @@ public class Controller {
 		}
 	}
 
-	public void drawRandomTriangles(int sideLength, boolean upright, int number, Color color) {
+	public void drawRandomStars(int sideLength, int number) {
+
+
+		Image star = new Image(new File("resources/triangle_left.png").toURI().toString());
+		int imgHeight = (int)star.getWidth() / 2;
+		int imgWidth = (int)star.getWidth() / 2;
 
 		for (int i = 0; i < number; i++) {
-			xPos = random.nextInt(canvasWidth);
-			yPos = random.nextInt(canvasHeight);
+			xPos = random.nextInt(canvasWidth - imgWidth);
+			yPos = random.nextInt(canvasHeight - imgHeight);
 
-			drawTriangle(sideLength, upright, xPos, yPos, color);
+			gc.drawImage(star ,xPos, yPos, sideLength, sideLength);
+		}
+	}
+
+
+
+	public void drawRandomTriangles(int sideLength, boolean upright, int number) {
+
+
+		Image triangle_left = new Image(new File("resources/triangle_left.png").toURI().toString());
+		Image triangle = new Image(new File("resources/triangle.png").toURI().toString());
+
+		int imgHeight = (int)triangle.getHeight() / 2;
+		int imgWidth = (int)triangle.getWidth() / 2;
+
+		for (int i = 0; i < number; i++) {
+			xPos = random.nextInt(canvasWidth - imgWidth);
+			yPos = random.nextInt(canvasHeight - imgHeight);
+
+			if(upright)
+				gc.drawImage(triangle ,xPos, yPos, sideLength, sideLength);
+			else
+				gc.drawImage(triangle_left ,xPos, yPos, sideLength, sideLength);
 		}
 	}
 
@@ -365,16 +451,15 @@ public class Controller {
 
 	}
 
-	public void drawTriangle(int sideLength, boolean upright, int xPos, int yPos, Color color)
+	public void drawTriangle(Image image, int sideLength, boolean upright, int xPos, int yPos)
 	{
-		Image image = new Image(new File("resources/triangle.png").toURI().toString());
-		gc.drawImage(image, xPos, yPos);
+		gc.drawImage(image,xPos, yPos, sideLength, sideLength);
 	}
 
 	public void drawElephant()
 	{
 		Image image = new Image(new File("resources/pink_elephant.png").toURI().toString());
-		gc.drawImage(image, 200,200, canvasWidth / 2, canvasHeight / 2);
+		gc.drawImage(image, canvasWidth / 2, canvasHeight / 2, 60, 60);
 	}
 
 }

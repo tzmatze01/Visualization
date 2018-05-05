@@ -48,7 +48,10 @@
                <Font size="20.0" />
             </font>
          </Label>
-         <ComboBox fx:id="cb_displayTime" onAction="#setDisplayTime" prefWidth="150.0" promptText="Anzeigezeit..."/>
+         <HBox alignment="TOP_CENTER">
+            <ComboBox fx:id="cb_displayTime" onAction="#setDisplayTime" prefWidth="150.0" promptText="Anzeigezeit..."/>
+            <ComboBox fx:id="cb_numObjects" onAction="#setNumObjects" prefWidth="150.0" promptText="Objektanzahl..."/>
+         </HBox>
       </VBox>
    </top>
 
